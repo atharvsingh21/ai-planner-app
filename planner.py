@@ -5,12 +5,6 @@ import json
 from dateutil import parser
 from fpdf import FPDF
 
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-
-SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 DEFAULTS_FILE = "saved_default_calendars.json"
 
 st.set_page_config(page_title="AI Planner", layout="wide")
@@ -114,21 +108,17 @@ def save_current_as_default(name, schedule):
 
 
 def get_calendar_service():
-    events = []
-
-if service:
-    events_result = service.events().list(
-        calendarId="primary",
-        maxResults=10,
-        singleEvents=True,
-        orderBy="startTime"
-    ).execute()
-    events = events_result.get("items", [])
+    return None
 
 
 def get_todays_events():
+    service = get_calendar_service()
+
+    if service is None:
+        st.warning("Google Calendar sync is available only in the local version right now.")
+        return []
+
     try:
-        service = get_calendar_service()
         now = datetime.now().astimezone()
         start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_day = now.replace(hour=23, minute=59, second=59, microsecond=0)
