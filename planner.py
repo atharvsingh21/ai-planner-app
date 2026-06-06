@@ -114,39 +114,8 @@ def save_current_as_default(name, schedule):
 
 
 def get_calendar_service():
-    creds = None
-
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            try:
-                creds.refresh(Request())
-            except Exception:
-                creds = None
-
-        if not creds:
-            client_config = {
-                "installed": {
-                    "client_id": st.secrets["google_oauth"]["client_id"],
-                    "project_id": st.secrets["google_oauth"]["project_id"],
-                    "auth_uri": st.secrets["google_oauth"]["auth_uri"],
-                    "token_uri": st.secrets["google_oauth"]["token_uri"],
-                    "auth_provider_x509_cert_url": st.secrets["google_oauth"]["auth_provider_x509_cert_url"],
-                    "client_secret": st.secrets["google_oauth"]["client_secret"],
-                    "redirect_uris": list(st.secrets["google_oauth"]["redirect_uris"]),
-                }
-            }
-
-            flow = InstalledAppFlow.from_client_config(client_config, SCOPES)
-            creds = flow.run_local_server(port=0)
-
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
-
-    return build("calendar", "v3", credentials=creds)
-    return build("calendar", "v3", credentials=creds)
+    st.warning("Google Calendar sync is available only in the local version right now.")
+    return None
 
 
 def get_todays_events():
