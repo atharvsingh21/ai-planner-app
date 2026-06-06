@@ -114,8 +114,16 @@ def save_current_as_default(name, schedule):
 
 
 def get_calendar_service():
-    st.warning("Google Calendar sync is available only in the local version right now.")
-    return None
+    events = []
+
+if service:
+    events_result = service.events().list(
+        calendarId="primary",
+        maxResults=10,
+        singleEvents=True,
+        orderBy="startTime"
+    ).execute()
+    events = events_result.get("items", [])
 
 
 def get_todays_events():
