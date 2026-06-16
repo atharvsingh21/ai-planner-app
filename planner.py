@@ -107,37 +107,8 @@ def save_current_as_default(name, schedule):
     save_default_calendars(defaults)
 
 
-def get_calendar_service():
-    return None
-
-
 def get_todays_events():
-    service = get_calendar_service()
-
-    if service is None:
-        st.warning("Google Calendar sync is available only in the local version right now.")
-        return []
-
-    try:
-        now = datetime.now().astimezone()
-        start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_of_day = now.replace(hour=23, minute=59, second=59, microsecond=0)
-
-        events_result = (
-            service.events()
-            .list(
-                calendarId="primary",
-                timeMin=start_of_day.isoformat(),
-                timeMax=end_of_day.isoformat(),
-                singleEvents=True,
-                orderBy="startTime",
-            )
-            .execute()
-        )
-
-        return events_result.get("items", [])
-    except Exception as e:
-        return f"Error: {e}"
+    return []
 
 
 def parse_iso(raw):
@@ -201,6 +172,21 @@ if "edit_mode" not in st.session_state:
 st.title("AI Planner")
 st.caption(today)
 
+if not st.user.is_logged_in:
+    st.subheader("Sign in")
+    st.write("Please sign in with Google to use AI Planner on mobile or browser.")
+    if st.button("Sign in with Google"):
+        st.login("google")
+    st.stop()
+
+top_col1, top_col2 = st.columns([3, 1])
+with top_col1:
+    user_name = st.user.get("name", "User")
+    st.success(f"Signed in as {user_name}")
+with top_col2:
+    if st.button("Log out", use_container_width=True):
+        st.logout()
+
 main_left, main_right = st.columns([1, 1])
 
 with main_left:
@@ -225,6 +211,7 @@ with main_left:
     dinner_time = st.time_input("Dinner", value=time(18, 30))
 
     st.subheader("Calendar")
+    st.info("Google sign-in is enabled. Calendar sync wiring will be added next.")
 
     c1, c2 = st.columns([1, 1])
     with c1:
